@@ -4,8 +4,11 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
+    "demo:build": "ng build ngx-navigational-list-demo --configuration production --base-href \"/ngx-navigational-list/\"",
+    "watch-demo": "ng serve ngx-navigational-list-demo",
+    "ngx-navigational-list:build": "ng build ngx-navigational-list --configuration production",
+    "ngx-navigational-list:watch": "ng build ngx-navigational-list --watch --configuration development",
+    "deployDemo": "npx angular-cli-ghpages --dir=dist/ngx-navigational-list-demo/browser",
     "test": "ng test"
   },
   "private": true,
@@ -20,8 +23,10 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@angular/build": "^20.3.2",
     "@angular/cli": "^20.0.3",
     "@angular/compiler-cli": "^20.0.0",
+    "@tmdjr/ngx-mfe-orchestrator-contracts": "^0.0.47",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.7.0",
     "karma": "~6.4.0",
@@ -29,6 +34,7 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "ng-packagr": "^20.3.0",
     "typescript": "~5.8.2"
   }
 }
