@@ -1,63 +1,252 @@
 # NgxNavigationalList
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.0.
+This library provides a service for managing hierarchical navigation data in micro frontend applications using Angular 20.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Installation
 
 ```bash
-ng generate component component-name
+npm install @tmdjr/ngx-navigational-list
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Usage
 
-```bash
-ng generate --help
+### Basic Setup
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { NgxNavigationalListService, NavigationData, HierarchicalMenuItem } from '@tmdjr/ngx-navigational-list';
+import { Observable } from 'rxjs';
+
+@Component({
+  selector: 'app-navigation',
+  templateUrl: './navigation.component.html'
+})
+export class NavigationComponent implements OnInit {
+  headerNavigation$: Observable<HierarchicalMenuItem[]>;
+
+  constructor(private navService: NgxNavigationalListService) {
+    this.headerNavigation$ = this.navService.getFilteredNavigationBySubtypeAndState('HEADER', 'FULL');
+  }
+
+  ngOnInit() {
+    // Set navigation data received from the shell
+    const navigationData: NavigationData = {
+      domain: "ADMIN",
+      structuralSubtypes: {
+        HEADER: {
+          states: {
+            FULL: [
+              {
+                "_id": "68d097bb26641456d521c398",
+                "menuItemText": "Dashboard",
+                "routePath": "/dashboard",
+                "sortId": 0,
+                "authRequired": false,
+                "domain": "ADMIN",
+                "structuralSubtype": "HEADER",
+                "state": "FULL",
+                "version": 1,
+                "description": "Dashboard page",
+                "lastUpdated": "2025-09-22T01:29:31.104Z",
+                "archived": false,
+                "__v": 0
+              },
+              {
+                "_id": "68d03a5b26641456d521c2db",
+                "menuItemText": "Mission Controls",
+                "routePath": "/mission-controls",
+                "sortId": 3,
+                "authRequired": false,
+                "domain": "ADMIN",
+                "structuralSubtype": "HEADER",
+                "state": "FULL",
+                "version": 3,
+                "description": "Mission control center",
+                "lastUpdated": "2025-09-22T01:29:31.104Z",
+                "archived": false,
+                "__v": 0
+              },
+              {
+                "_id": "68d0a16926641456d521c431",
+                "menuItemText": "Broadcast",
+                "routePath": "/broadcast",
+                "sortId": 0,
+                "authRequired": false,
+                "parentId": "68d03a5b26641456d521c2db",
+                "domain": "ADMIN",
+                "structuralSubtype": "HEADER",
+                "state": "FULL",
+                "version": 1,
+                "description": "Broadcast management",
+                "lastUpdated": "2025-09-22T01:29:31.104Z",
+                "archived": false,
+                "__v": 0
+              }
+            ]
+          }
+        }
+      }
+    };
+
+    this.navService.setNavigationData(navigationData);
+    this.navService.setAuthenticationState(true);
+  }
+}
 ```
 
-## Building
+### Template Example
 
-To build the library, run:
+```html
+<!-- navigation.component.html -->
+<nav class="navigation">
+  <ul class="nav-list">
+    <li
+      *ngFor="let menuItem of headerNavigation$ | async; trackBy: trackByMenuItemId"
+      class="nav-item"
+      [class.has-children]="menuItem.children.length > 0"
+    >
+      <a
+        [routerLink]="menuItem.routePath"
+        class="nav-link"
+        [title]="menuItem.tooltipText"
+      >
+        {{ menuItem.menuItemText }}
+      </a>
 
-```bash
-ng build ngx-navigational-list
+      <!-- Render child items recursively -->
+      <ul *ngIf="menuItem.children.length > 0" class="sub-nav-list">
+        <li
+          *ngFor="let childItem of menuItem.children; trackBy: trackByMenuItemId"
+          class="sub-nav-item"
+        >
+          <a
+            [routerLink]="childItem.routePath"
+            class="sub-nav-link"
+            [title]="childItem.tooltipText"
+          >
+            {{ childItem.menuItemText }}
+          </a>
+
+          <!-- Continue nesting for deeper levels if needed -->
+          <ul *ngIf="childItem.children.length > 0" class="sub-sub-nav-list">
+            <li
+              *ngFor="let grandChildItem of childItem.children; trackBy: trackByMenuItemId"
+              class="sub-sub-nav-item"
+            >
+              <a
+                [routerLink]="grandChildItem.routePath"
+                class="sub-sub-nav-link"
+                [title]="grandChildItem.tooltipText"
+              >
+                {{ grandChildItem.menuItemText }}
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
 ```
 
-This command will compile your project, and the build artifacts will be placed in the `dist/` directory.
+### Component Methods
 
-### Publishing the Library
+```typescript
+export class NavigationComponent implements OnInit {
+  // ... other code
 
-Once the project is built, you can publish your library by following these steps:
+  trackByMenuItemId(index: number, item: HierarchicalMenuItem): string {
+    return item._id;
+  }
 
-1. Navigate to the `dist` directory:
-   ```bash
-   cd dist/ngx-navigational-list
-   ```
+  // Get specific navigation for different states
+  getCompactNavigation() {
+    return this.navService.getFilteredNavigationBySubtypeAndState('HEADER', 'COMPACT');
+  }
 
-2. Run the `npm publish` command to publish your library to the npm registry:
-   ```bash
-   npm publish
-   ```
+  // Find a specific menu item
+  findMenuItem(id: string) {
+    return this.navService.findMenuItemById(id);
+  }
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
+  // Get current domain
+  getCurrentDomain() {
+    return this.navService.getCurrentDomain();
+  }
+}
 ```
 
-## Running end-to-end tests
+## API Reference
 
-For end-to-end (e2e) testing, run:
+### Types
 
-```bash
-ng e2e
+- **`NavigationData`**: The main data structure received from the shell
+- **`HierarchicalMenuItem`**: Menu item with populated children array
+- **`OrganizedNavigation`**: Processed navigation with hierarchy
+- **`StructuralSubtype`**: 'HEADER' | 'NAV' | 'FOOTER'
+- **`Domain`**: 'ADMIN' | 'WORKSHOP'
+- **`MenuState`**: 'FULL' | 'RELAXED' | 'COMPACT'
+
+### Service Methods
+
+#### Core Methods
+- `setNavigationData(data: NavigationData)`: Set the navigation data
+- `setAuthenticationState(isAuthenticated: boolean)`: Update auth state
+
+#### Navigation Retrieval
+- `getNavigationBySubtypeAndState(subtype, state)`: Get raw navigation
+- `getFilteredNavigationBySubtypeAndState(subtype, state)`: Get filtered by auth
+- `findMenuItemById(id)`: Find specific menu item
+- `getCurrentDomain()`: Get current domain
+- `getAvailableSubtypes()`: Get available structural subtypes
+- `getAvailableStates(subtype)`: Get available states for subtype
+
+#### Utility Methods
+- `flattenMenuItems(items)`: Flatten hierarchical structure
+
+## Features
+
+- ✅ **Hierarchical Structure**: Automatically builds parent-child relationships using `parentId`
+- ✅ **Authentication Filtering**: Filters menu items based on `authRequired` and user auth state
+- ✅ **Sorting**: Automatically sorts items by `sortId` at all levels
+- ✅ **Multiple States**: Supports FULL, RELAXED, COMPACT menu states
+- ✅ **Multiple Domains**: Supports ADMIN and WORKSHOP domains
+- ✅ **TypeScript**: Full TypeScript support with comprehensive types
+- ✅ **RxJS Observables**: Reactive data flow for real-time updates
+- ✅ **Utility Functions**: Helper functions for searching, filtering, and manipulation
+
+## Data Structure
+
+The service expects navigation data in this format:
+
+```json
+{
+  "domain": "ADMIN",
+  "structuralSubtypes": {
+    "HEADER": {
+      "states": {
+        "FULL": [
+          {
+            "_id": "unique-id",
+            "menuItemText": "Menu Item",
+            "routePath": "/path",
+            "sortId": 0,
+            "authRequired": false,
+            "parentId": "parent-id-optional",
+            "domain": "ADMIN",
+            "structuralSubtype": "HEADER",
+            "state": "FULL",
+            "version": 1,
+            "description": "Description",
+            "lastUpdated": "2025-09-22T01:29:31.104Z",
+            "archived": false,
+            "__v": 0
+          }
+        ]
+      }
+    }
+  }
+}
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+The service automatically converts this flat structure into a hierarchical menu tree based on the `parentId` relationships.
