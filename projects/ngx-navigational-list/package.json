@@ -1,11 +1,11 @@
 {
   "name": "@tmdjr/ngx-navigational-list",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "peerDependencies": {
     "@angular/common": "20.1.6",
     "@angular/core": "20.1.6",
     "@tmdjr/ngx-mfe-orchestrator-contracts": "^0.0.47",
-    "@tmdjr/service-navigational-list-contracts": "^0.0.27"
+    "@tmdjr/service-navigational-list-contracts": "^0.0.28"
   },
   "dependencies": {
     "tslib": "^2.3.0"

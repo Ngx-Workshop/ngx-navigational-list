@@ -15,6 +15,8 @@ export type StructuralSubtype = 'HEADER' | 'NAV' | 'FOOTER';
  */
 export type Domain = 'ADMIN' | 'WORKSHOP';
 
+export type Role = 'regular' | 'admin' | 'publisher' | 'none';
+
 /**
  * Structure for organizing menu items by their state
  */

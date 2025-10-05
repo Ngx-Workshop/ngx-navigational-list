@@ -1,12 +1,15 @@
 import { Injectable } from "@angular/core";
 import { MenuItemDto } from '@tmdjr/service-navigational-list-contracts';
+
+
 import { BehaviorSubject, filter, map, Observable } from "rxjs";
 import {
   NavigationData,
   OrganizedNavigation,
   HierarchicalMenuItem,
   StructuralSubtype,
-  Domain
+  Domain,
+  Role
 } from './types/navigation-data.types';
 import {
   organizeNavigationData,
@@ -31,8 +34,8 @@ export class NgxNavigationalListService {
   );
 
   // Authentication state
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-  public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+  private roleSubject = new BehaviorSubject<Role>('none');
+  public role$ = this.roleSubject.asObservable();
 
   /**
    * Sets the navigation data received from the shell
@@ -44,8 +47,8 @@ export class NgxNavigationalListService {
   /**
    * Updates the authentication state
    */
-  setAuthenticationState(isAuthenticated: boolean): void {
-    this.isAuthenticatedSubject.next(isAuthenticated);
+  setRoleState(role: Role): void {
+    this.roleSubject.next(role);
   }
 
   /**
@@ -76,8 +79,8 @@ export class NgxNavigationalListService {
   ): Observable<HierarchicalMenuItem[]> {
     return this.getNavigationBySubtypeAndState(subtype, state).pipe(
       map(items => {
-        const isAuthenticated = this.isAuthenticatedSubject.value;
-        return filterMenuItemsByAuth(items, isAuthenticated);
+        const role = this.roleSubject.value;
+        return filterMenuItemsByAuth(items, role);
       })
     );
   }

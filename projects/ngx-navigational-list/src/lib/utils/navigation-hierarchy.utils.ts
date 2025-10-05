@@ -1,5 +1,5 @@
 import { MenuItemDto } from '@tmdjr/service-navigational-list-contracts';
-import { HierarchicalMenuItem, NavigationData, OrganizedNavigation } from '../types/navigation-data.types';
+import { HierarchicalMenuItem, NavigationData, OrganizedNavigation, Role } from '../types/navigation-data.types';
 
 /**
  * Converts a flat array of MenuItemDto objects into a hierarchical structure
@@ -138,12 +138,33 @@ export function findMenuItemById(hierarchicalItems: HierarchicalMenuItem[], id: 
  */
 export function filterMenuItemsByAuth(
   hierarchicalItems: HierarchicalMenuItem[],
-  isAuthenticated: boolean
+  role: Role
 ): HierarchicalMenuItem[] {
+  // Helper to determine if a user with `userRole` can access an item with `itemRole`
+  const canAccess = (itemRole: Role | undefined, userRole: Role): boolean => {
+    const effectiveItemRole: Role = itemRole ?? 'none';
+
+    switch (userRole) {
+      case 'admin':
+        // Admin sees everything
+        return true;
+      case 'publisher':
+        // Publisher sees all except items restricted to admin only
+        return effectiveItemRole !== 'admin';
+      case 'regular':
+        // Regular sees only regular and none
+        return effectiveItemRole === 'regular' || effectiveItemRole === 'none';
+      case 'none':
+      default:
+        // None sees only none
+        return effectiveItemRole === 'none';
+    }
+  };
+
   return hierarchicalItems
-    .filter(item => !item.authRequired || isAuthenticated)
+    .filter(item => canAccess(item.role as Role | undefined, role))
     .map(item => ({
       ...item,
-      children: filterMenuItemsByAuth(item.children, isAuthenticated)
+      children: filterMenuItemsByAuth(item.children, role)
     }));
 }
