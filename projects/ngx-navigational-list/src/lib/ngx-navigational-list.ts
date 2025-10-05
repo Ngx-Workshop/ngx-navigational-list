@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { MenuItemDto } from '@tmdjr/service-navigational-list-contracts';
 
 
-import { BehaviorSubject, filter, map, Observable } from "rxjs";
+import { BehaviorSubject, filter, map, Observable, tap } from "rxjs";
 import {
   NavigationData,
   OrganizedNavigation,
@@ -30,7 +30,7 @@ export class NgxNavigationalListService {
 
   // Organized navigation with hierarchy
   public organizedNavigation$: Observable<OrganizedNavigation | null> = this.navigationData$.pipe(
-    map(data => data ? organizeNavigationData(data) : null)
+    map(data => data ? organizeNavigationData(data) : null),
   );
 
   // Authentication state
@@ -59,14 +59,17 @@ export class NgxNavigationalListService {
     state: string = 'FULL'
   ): Observable<HierarchicalMenuItem[]> {
     return this.organizedNavigation$.pipe(
+      tap(() => console.log('1')),
       filter((nav): nav is OrganizedNavigation => nav !== null),
+      tap(() => console.log('2')),
       map(nav => {
         const subtypeData = nav.structuralSubtypes[subtype];
         if (!subtypeData || !subtypeData.states[state]) {
           return [];
         }
         return subtypeData.states[state];
-      })
+      }),
+      tap(() => console.log('3')),
     );
   }
 
@@ -78,10 +81,12 @@ export class NgxNavigationalListService {
     state: string = 'FULL'
   ): Observable<HierarchicalMenuItem[]> {
     return this.getNavigationBySubtypeAndState(subtype, state).pipe(
+      tap(() => console.log('4')),
       map(items => {
         const role = this.roleSubject.value;
         return filterMenuItemsByAuth(items, role);
-      })
+      }),
+      tap(() => console.log('5')),
     );
   }
 
