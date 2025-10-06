@@ -13,19 +13,19 @@ npm install @tmdjr/ngx-navigational-list
 ### Basic Setup
 
 ```typescript
-import { Component, OnInit } from '@angular/core';
-import { NgxNavigationalListService, NavigationData, HierarchicalMenuItem } from '@tmdjr/ngx-navigational-list';
-import { Observable } from 'rxjs';
+import { Component, OnInit } from "@angular/core";
+import { NgxNavigationalListService, NavigationData, HierarchicalMenuItem } from "@tmdjr/ngx-navigational-list";
+import { Observable } from "rxjs";
 
 @Component({
-  selector: 'app-navigation',
-  templateUrl: './navigation.component.html'
+  selector: "app-navigation",
+  templateUrl: "./navigation.component.html",
 })
 export class NavigationComponent implements OnInit {
   headerNavigation$: Observable<HierarchicalMenuItem[]>;
 
   constructor(private navService: NgxNavigationalListService) {
-    this.headerNavigation$ = this.navService.getFilteredNavigationBySubtypeAndState('HEADER', 'FULL');
+    this.headerNavigation$ = this.navService.getFilteredNavigationBySubtypeAndState("HEADER", "FULL");
   }
 
   ngOnInit() {
@@ -37,55 +37,55 @@ export class NavigationComponent implements OnInit {
           states: {
             FULL: [
               {
-                "_id": "68d097bb26641456d521c398",
-                "menuItemText": "Dashboard",
-                "routePath": "/dashboard",
-                "sortId": 0,
-                "authRequired": false,
-                "domain": "ADMIN",
-                "structuralSubtype": "HEADER",
-                "state": "FULL",
-                "version": 1,
-                "description": "Dashboard page",
-                "lastUpdated": "2025-09-22T01:29:31.104Z",
-                "archived": false,
-                "__v": 0
+                _id: "68d097bb26641456d521c398",
+                menuItemText: "Dashboard",
+                routePath: "/dashboard",
+                sortId: 0,
+                authRequired: false,
+                domain: "ADMIN",
+                structuralSubtype: "HEADER",
+                state: "FULL",
+                version: 1,
+                description: "Dashboard page",
+                lastUpdated: "2025-09-22T01:29:31.104Z",
+                archived: false,
+                __v: 0,
               },
               {
-                "_id": "68d03a5b26641456d521c2db",
-                "menuItemText": "Mission Controls",
-                "routePath": "/mission-controls",
-                "sortId": 3,
-                "authRequired": false,
-                "domain": "ADMIN",
-                "structuralSubtype": "HEADER",
-                "state": "FULL",
-                "version": 3,
-                "description": "Mission control center",
-                "lastUpdated": "2025-09-22T01:29:31.104Z",
-                "archived": false,
-                "__v": 0
+                _id: "68d03a5b26641456d521c2db",
+                menuItemText: "Mission Controls",
+                routePath: "/mission-controls",
+                sortId: 3,
+                authRequired: false,
+                domain: "ADMIN",
+                structuralSubtype: "HEADER",
+                state: "FULL",
+                version: 3,
+                description: "Mission control center",
+                lastUpdated: "2025-09-22T01:29:31.104Z",
+                archived: false,
+                __v: 0,
               },
               {
-                "_id": "68d0a16926641456d521c431",
-                "menuItemText": "Broadcast",
-                "routePath": "/broadcast",
-                "sortId": 0,
-                "authRequired": false,
-                "parentId": "68d03a5b26641456d521c2db",
-                "domain": "ADMIN",
-                "structuralSubtype": "HEADER",
-                "state": "FULL",
-                "version": 1,
-                "description": "Broadcast management",
-                "lastUpdated": "2025-09-22T01:29:31.104Z",
-                "archived": false,
-                "__v": 0
-              }
-            ]
-          }
-        }
-      }
+                _id: "68d0a16926641456d521c431",
+                menuItemText: "Broadcast",
+                routePath: "/broadcast",
+                sortId: 0,
+                authRequired: false,
+                parentId: "68d03a5b26641456d521c2db",
+                domain: "ADMIN",
+                structuralSubtype: "HEADER",
+                state: "FULL",
+                version: 1,
+                description: "Broadcast management",
+                lastUpdated: "2025-09-22T01:29:31.104Z",
+                archived: false,
+                __v: 0,
+              },
+            ],
+          },
+        },
+      },
     };
 
     this.navService.setNavigationData(navigationData);
@@ -100,46 +100,18 @@ export class NavigationComponent implements OnInit {
 <!-- navigation.component.html -->
 <nav class="navigation">
   <ul class="nav-list">
-    <li
-      *ngFor="let menuItem of headerNavigation$ | async; trackBy: trackByMenuItemId"
-      class="nav-item"
-      [class.has-children]="menuItem.children.length > 0"
-    >
-      <a
-        [routerLink]="menuItem.routePath"
-        class="nav-link"
-        [title]="menuItem.tooltipText"
-      >
-        {{ menuItem.menuItemText }}
-      </a>
+    <li *ngFor="let menuItem of headerNavigation$ | async; trackBy: trackByMenuItemId" class="nav-item" [class.has-children]="menuItem.children.length > 0">
+      <a [routerLink]="menuItem.routePath" class="nav-link" [title]="menuItem.tooltipText"> {{ menuItem.menuItemText }} </a>
 
       <!-- Render child items recursively -->
       <ul *ngIf="menuItem.children.length > 0" class="sub-nav-list">
-        <li
-          *ngFor="let childItem of menuItem.children; trackBy: trackByMenuItemId"
-          class="sub-nav-item"
-        >
-          <a
-            [routerLink]="childItem.routePath"
-            class="sub-nav-link"
-            [title]="childItem.tooltipText"
-          >
-            {{ childItem.menuItemText }}
-          </a>
+        <li *ngFor="let childItem of menuItem.children; trackBy: trackByMenuItemId" class="sub-nav-item">
+          <a [routerLink]="childItem.routePath" class="sub-nav-link" [title]="childItem.tooltipText"> {{ childItem.menuItemText }} </a>
 
           <!-- Continue nesting for deeper levels if needed -->
           <ul *ngIf="childItem.children.length > 0" class="sub-sub-nav-list">
-            <li
-              *ngFor="let grandChildItem of childItem.children; trackBy: trackByMenuItemId"
-              class="sub-sub-nav-item"
-            >
-              <a
-                [routerLink]="grandChildItem.routePath"
-                class="sub-sub-nav-link"
-                [title]="grandChildItem.tooltipText"
-              >
-                {{ grandChildItem.menuItemText }}
-              </a>
+            <li *ngFor="let grandChildItem of childItem.children; trackBy: trackByMenuItemId" class="sub-sub-nav-item">
+              <a [routerLink]="grandChildItem.routePath" class="sub-sub-nav-link" [title]="grandChildItem.tooltipText"> {{ grandChildItem.menuItemText }} </a>
             </li>
           </ul>
         </li>
@@ -161,7 +133,7 @@ export class NavigationComponent implements OnInit {
 
   // Get specific navigation for different states
   getCompactNavigation() {
-    return this.navService.getFilteredNavigationBySubtypeAndState('HEADER', 'COMPACT');
+    return this.navService.getFilteredNavigationBySubtypeAndState("HEADER", "COMPACT");
   }
 
   // Find a specific menu item
@@ -190,10 +162,12 @@ export class NavigationComponent implements OnInit {
 ### Service Methods
 
 #### Core Methods
+
 - `setNavigationData(data: NavigationData)`: Set the navigation data
 - `setAuthenticationState(isAuthenticated: boolean)`: Update auth state
 
 #### Navigation Retrieval
+
 - `getNavigationBySubtypeAndState(subtype, state)`: Get raw navigation
 - `getFilteredNavigationBySubtypeAndState(subtype, state)`: Get filtered by auth
 - `findMenuItemById(id)`: Find specific menu item
@@ -202,6 +176,7 @@ export class NavigationComponent implements OnInit {
 - `getAvailableStates(subtype)`: Get available states for subtype
 
 #### Utility Methods
+
 - `flattenMenuItems(items)`: Flatten hierarchical structure
 
 ## Features

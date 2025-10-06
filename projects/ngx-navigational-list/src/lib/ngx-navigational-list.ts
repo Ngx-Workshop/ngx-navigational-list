@@ -1,37 +1,38 @@
-import { Injectable } from "@angular/core";
-import { MenuItemDto } from '@tmdjr/service-navigational-list-contracts';
+import { Injectable } from '@angular/core';
 
-
-import { BehaviorSubject, filter, map, Observable, tap } from "rxjs";
+import { BehaviorSubject, filter, map, Observable } from 'rxjs';
 import {
+  Domain,
+  HierarchicalMenuItem,
   NavigationData,
   OrganizedNavigation,
-  HierarchicalMenuItem,
+  Role,
   StructuralSubtype,
-  Domain,
-  Role
 } from './types/navigation-data.types';
 import {
-  organizeNavigationData,
   filterMenuItemsByAuth,
   findMenuItemById,
-  flattenMenuHierarchy
+  flattenMenuHierarchy,
+  organizeNavigationData,
 } from './utils/navigation-hierarchy.utils';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class NgxNavigationalListService {
   constructor() {}
 
   // Main navigation data subject
-  private navigationDataSubject = new BehaviorSubject<NavigationData | null>(null);
+  private navigationDataSubject = new BehaviorSubject<NavigationData | null>(
+    null
+  );
   public navigationData$ = this.navigationDataSubject.asObservable();
 
   // Organized navigation with hierarchy
-  public organizedNavigation$: Observable<OrganizedNavigation | null> = this.navigationData$.pipe(
-    map(data => data ? organizeNavigationData(data) : null),
-  );
+  public organizedNavigation$: Observable<OrganizedNavigation | null> =
+    this.navigationData$.pipe(
+      map((data) => (data ? organizeNavigationData(data) : null))
+    );
 
   // Authentication state
   private roleSubject = new BehaviorSubject<Role>('none');
@@ -59,17 +60,14 @@ export class NgxNavigationalListService {
     state: string = 'FULL'
   ): Observable<HierarchicalMenuItem[]> {
     return this.organizedNavigation$.pipe(
-      tap(() => console.log('1')),
       filter((nav): nav is OrganizedNavigation => nav !== null),
-      tap(() => console.log('2')),
-      map(nav => {
+      map((nav) => {
         const subtypeData = nav.structuralSubtypes[subtype];
         if (!subtypeData || !subtypeData.states[state]) {
           return [];
         }
         return subtypeData.states[state];
-      }),
-      tap(() => console.log('3')),
+      })
     );
   }
 
@@ -81,12 +79,10 @@ export class NgxNavigationalListService {
     state: string = 'FULL'
   ): Observable<HierarchicalMenuItem[]> {
     return this.getNavigationBySubtypeAndState(subtype, state).pipe(
-      tap(() => console.log('4')),
-      map(items => {
+      map((items) => {
         const role = this.roleSubject.value;
         return filterMenuItemsByAuth(items, role);
-      }),
-      tap(() => console.log('5')),
+      })
     );
   }
 
@@ -96,7 +92,7 @@ export class NgxNavigationalListService {
   findMenuItemById(id: string): Observable<HierarchicalMenuItem | undefined> {
     return this.organizedNavigation$.pipe(
       filter((nav): nav is OrganizedNavigation => nav !== null),
-      map(nav => {
+      map((nav) => {
         // Search across all subtypes and states
         for (const subtypeData of Object.values(nav.structuralSubtypes)) {
           if (subtypeData) {
@@ -117,9 +113,7 @@ export class NgxNavigationalListService {
    * Gets the current domain
    */
   getCurrentDomain(): Observable<Domain | null> {
-    return this.navigationData$.pipe(
-      map(data => data?.domain || null)
-    );
+    return this.navigationData$.pipe(map((data) => data?.domain || null));
   }
 
   /**
@@ -128,7 +122,7 @@ export class NgxNavigationalListService {
   getAvailableSubtypes(): Observable<StructuralSubtype[]> {
     return this.organizedNavigation$.pipe(
       filter((nav): nav is OrganizedNavigation => nav !== null),
-      map(nav => Object.keys(nav.structuralSubtypes) as StructuralSubtype[])
+      map((nav) => Object.keys(nav.structuralSubtypes) as StructuralSubtype[])
     );
   }
 
@@ -138,7 +132,7 @@ export class NgxNavigationalListService {
   getAvailableStates(subtype: StructuralSubtype): Observable<string[]> {
     return this.organizedNavigation$.pipe(
       filter((nav): nav is OrganizedNavigation => nav !== null),
-      map(nav => {
+      map((nav) => {
         const subtypeData = nav.structuralSubtypes[subtype];
         return subtypeData ? Object.keys(subtypeData.states) : [];
       })

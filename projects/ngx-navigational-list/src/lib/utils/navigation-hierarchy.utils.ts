@@ -1,27 +1,34 @@
 import { MenuItemDto } from '@tmdjr/service-navigational-list-contracts';
-import { HierarchicalMenuItem, NavigationData, OrganizedNavigation, Role } from '../types/navigation-data.types';
+import {
+  HierarchicalMenuItem,
+  NavigationData,
+  OrganizedNavigation,
+  Role,
+} from '../types/navigation-data.types';
 
 /**
  * Converts a flat array of MenuItemDto objects into a hierarchical structure
  * using the parentId relationships
  */
-export function buildMenuHierarchy(menuItems: MenuItemDto[]): HierarchicalMenuItem[] {
+export function buildMenuHierarchy(
+  menuItems: MenuItemDto[]
+): HierarchicalMenuItem[] {
   // Create a map for fast lookup
   const itemMap = new Map<string, HierarchicalMenuItem>();
   const rootItems: HierarchicalMenuItem[] = [];
 
   // First pass: Create all items and add them to the map
-  menuItems.forEach(item => {
+  menuItems.forEach((item) => {
     const hierarchicalItem: HierarchicalMenuItem = {
       ...item,
       children: [],
-      routeUrl: toSlug(item.menuItemText)
+      routeUrl: toSlug(item.menuItemText),
     };
     itemMap.set(item._id, hierarchicalItem);
   });
 
   // Second pass: Build the hierarchy
-  menuItems.forEach(item => {
+  menuItems.forEach((item) => {
     const hierarchicalItem = itemMap.get(item._id);
     if (!hierarchicalItem) return;
 
@@ -45,7 +52,7 @@ export function buildMenuHierarchy(menuItems: MenuItemDto[]): HierarchicalMenuIt
 
   // Sort children recursively
   const sortChildren = (items: HierarchicalMenuItem[]): void => {
-    items.forEach(item => {
+    items.forEach((item) => {
       if (item.children.length > 0) {
         item.children.sort((a, b) => a.sortId - b.sortId);
         sortChildren(item.children);
@@ -61,29 +68,35 @@ export function buildMenuHierarchy(menuItems: MenuItemDto[]): HierarchicalMenuIt
 /**
  * Converts the incoming NavigationData into an organized hierarchical structure
  */
-export function organizeNavigationData(navigationData: NavigationData): OrganizedNavigation {
+export function organizeNavigationData(
+  navigationData: NavigationData
+): OrganizedNavigation {
   const organizedNav: OrganizedNavigation = {
     domain: navigationData.domain,
-    structuralSubtypes: {}
+    structuralSubtypes: {},
   };
 
   // Process each structural subtype
-  Object.entries(navigationData.structuralSubtypes).forEach(([subtypeKey, subtypeData]) => {
-    if (!subtypeData) return;
+  Object.entries(navigationData.structuralSubtypes).forEach(
+    ([subtypeKey, subtypeData]) => {
+      if (!subtypeData) return;
 
-    const organizedSubtype = {
-      states: {} as { [state: string]: HierarchicalMenuItem[] }
-    };
+      const organizedSubtype = {
+        states: {} as { [state: string]: HierarchicalMenuItem[] },
+      };
 
-    // Process each state within the subtype
-    Object.entries(subtypeData.states).forEach(([stateKey, menuItems]) => {
-      if (Array.isArray(menuItems)) {
-        organizedSubtype.states[stateKey] = buildMenuHierarchy(menuItems);
-      }
-    });
+      // Process each state within the subtype
+      Object.entries(subtypeData.states).forEach(([stateKey, menuItems]) => {
+        if (Array.isArray(menuItems)) {
+          organizedSubtype.states[stateKey] = buildMenuHierarchy(menuItems);
+        }
+      });
 
-    organizedNav.structuralSubtypes[subtypeKey as keyof typeof organizedNav.structuralSubtypes] = organizedSubtype;
-  });
+      organizedNav.structuralSubtypes[
+        subtypeKey as keyof typeof organizedNav.structuralSubtypes
+      ] = organizedSubtype;
+    }
+  );
 
   return organizedNav;
 }
@@ -99,11 +112,13 @@ function toSlug(value: string): string {
  * Flattens a hierarchical menu structure back to a flat array
  * Useful for searching or filtering operations
  */
-export function flattenMenuHierarchy(hierarchicalItems: HierarchicalMenuItem[]): HierarchicalMenuItem[] {
+export function flattenMenuHierarchy(
+  hierarchicalItems: HierarchicalMenuItem[]
+): HierarchicalMenuItem[] {
   const flattened: HierarchicalMenuItem[] = [];
 
   const flatten = (items: HierarchicalMenuItem[]): void => {
-    items.forEach(item => {
+    items.forEach((item) => {
       flattened.push(item);
       if (item.children.length > 0) {
         flatten(item.children);
@@ -118,7 +133,10 @@ export function flattenMenuHierarchy(hierarchicalItems: HierarchicalMenuItem[]):
 /**
  * Finds a menu item by its ID in a hierarchical structure
  */
-export function findMenuItemById(hierarchicalItems: HierarchicalMenuItem[], id: string): HierarchicalMenuItem | undefined {
+export function findMenuItemById(
+  hierarchicalItems: HierarchicalMenuItem[],
+  id: string
+): HierarchicalMenuItem | undefined {
   for (const item of hierarchicalItems) {
     if (item._id === id) {
       return item;
@@ -143,7 +161,6 @@ export function filterMenuItemsByAuth(
   // Helper to determine if a user with `userRole` can access an item with `itemRole`
   const canAccess = (itemRole: Role | undefined, userRole: Role): boolean => {
     const effectiveItemRole: Role = itemRole ?? 'none';
-
     switch (userRole) {
       case 'admin':
         // Admin sees everything
@@ -160,11 +177,10 @@ export function filterMenuItemsByAuth(
         return effectiveItemRole === 'none';
     }
   };
-
   return hierarchicalItems
-    .filter(item => canAccess(item.role as Role | undefined, role))
-    .map(item => ({
+    .filter((item) => canAccess(item.role as Role | undefined, role))
+    .map((item) => ({
       ...item,
-      children: filterMenuItemsByAuth(item.children, role)
+      children: filterMenuItemsByAuth(item.children, role),
     }));
 }
