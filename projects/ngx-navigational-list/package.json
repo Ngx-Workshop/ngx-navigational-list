@@ -2,9 +2,9 @@
   "name": "@tmdjr/ngx-navigational-list",
   "version": "21.0.1",
   "peerDependencies": {
-    "@angular/common": "20.1.6",
-    "@angular/core": "20.1.6",
-    "@tmdjr/service-navigational-list-contracts": "^0.0.28"
+    "@angular/common": "21.0.0",
+    "@angular/core": "21.0.0",
+    "@tmdjr/service-navigational-list-contracts": "^0.0.30"
   },
   "dependencies": {
     "tslib": "^2.3.0"
