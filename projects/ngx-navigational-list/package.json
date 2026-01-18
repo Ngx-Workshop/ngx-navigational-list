@@ -1,6 +1,6 @@
 {
   "name": "@tmdjr/ngx-navigational-list",
-  "version": "0.0.12",
+  "version": "21.0.1",
   "peerDependencies": {
     "@angular/common": "20.1.6",
     "@angular/core": "20.1.6",
