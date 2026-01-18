@@ -2,8 +2,8 @@
   "name": "@tmdjr/ngx-navigational-list",
   "version": "21.0.1",
   "peerDependencies": {
-    "@angular/common": "21.0.0",
-    "@angular/core": "21.0.0",
+    "@angular/common": "^21.1.0",
+    "@angular/core": "^21.1.0",
     "@tmdjr/service-navigational-list-contracts": "^0.0.30"
   },
   "dependencies": {
