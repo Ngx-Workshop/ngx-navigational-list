@@ -22,7 +22,8 @@ export function buildMenuHierarchy(
     const hierarchicalItem: HierarchicalMenuItem = {
       ...item,
       children: [],
-      routeUrl: toSlug(item.menuItemText),
+      // routeUrl: toSlug(item.menuItemText),
+      routeUrl: item.routePath,
     };
     itemMap.set(item._id, hierarchicalItem);
   });
